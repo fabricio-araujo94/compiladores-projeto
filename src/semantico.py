@@ -28,7 +28,7 @@ class Visitor:
 class AnalisadorSemantico(Visitor):
     def __init__(self):
         self.tabela_simbolos = TabelaSimbolos()
-        # Define os tipos esperados para os argumentos dos comandos
+        # --- ATUALIZE ESTE DICIONÁRIO ---
         self.regras_comandos = {
             'AVANCAR': ['inteiro', 'real'],
             'RECUAR': ['inteiro', 'real'],
@@ -36,7 +36,8 @@ class AnalisadorSemantico(Visitor):
             'GIRAR_ESQUERDA': ['inteiro', 'real'],
             'DEFINIR_ESPESSURA': ['inteiro', 'real'],
             'DEFINIR_COR': ['texto'],
-            'COR_DE_FUNDO': ['texto']
+            'COR_DE_FUNDO': ['texto'],
+            'CIRCULO': ['inteiro', 'real'] # Adicionado
         }
 
     def visit_Programa(self, node: ast.Programa):

@@ -46,7 +46,9 @@ def tokenizar(codigo_fonte: str) -> List[Token]:
         'repita', 'vezes', 'fim_repita', 'enquanto', 'faca', 'fim_enquanto', 'se', 'entao',
         'senao', 'fim_se', 'avancar', 'recuar', 'girar_direita', 'girar_esquerda',
         'ir_para', 'levantar_caneta', 'abaixar_caneta', 'definir_cor', 'definir_espessura',
-        'cor_de_fundo', 'limpar_tela'
+        'cor_de_fundo', 'limpar_tela',
+        # --- NOVOS COMANDOS ADICIONADOS ---
+        'circulo', 'empurrar_posicao', 'restaurar_posicao'
     }
 
     # Compila as expressões regulares em um único padrão

@@ -8,12 +8,10 @@ class Parser:
         self.token_atual = self.tokens[self.pos]
 
     def _avancar(self):
-        """ Avança para o próximo token na lista. """
         self.pos += 1
         self.token_atual = self.tokens[self.pos] if self.pos < len(self.tokens) else None
 
     def _consumir(self, tipo_esperado: str):
-        """ Consome o token atual se for do tipo esperado, senão lança um erro. """
         if self.token_atual and self.token_atual.tipo == tipo_esperado:
             token = self.token_atual
             self._avancar()
@@ -26,11 +24,9 @@ class Parser:
             )
 
     def parse(self) -> ASTNode:
-        """ Inicia a análise sintática. """
         return self.programa()
 
     def programa(self) -> Programa:
-        """ programa ::= INICIO bloco FIM """
         self._consumir('INICIO')
         bloco_node = self.bloco()
         self._consumir('FIM')
@@ -39,10 +35,8 @@ class Parser:
         return Programa(bloco=bloco_node)
 
     def bloco(self) -> Bloco:
-        """ bloco ::= { declaracao_variaveis } { comando } """
         declaracoes = []
         comandos = []
-
         tokens_de_parada = {'FIM', 'FIM_REPITA', 'FIM_SE', 'FIM_ENQUANTO', 'SENAO', 'EOF'}
 
         while self.token_atual and self.token_atual.tipo == 'VAR':
@@ -54,21 +48,17 @@ class Parser:
         return Bloco(declaracoes, comandos)
 
     def declaracao_variaveis(self) -> VarDecl:
-        """ declaracao_variaveis ::= VAR tipo DOIS_PONTOS lista_ids PONTO_VIRGULA """
         self._consumir('VAR')
         tipo_node = self.tipo()
         self._consumir('DOIS_PONTOS')
-
         var_nodes = [Variavel(self._consumir('ID'))]
         while self.token_atual.tipo == 'VIRGULA':
             self._consumir('VIRGULA')
             var_nodes.append(Variavel(self._consumir('ID')))
-
         self._consumir('PONTO_VIRGULA')
         return VarDecl(tipo_node, var_nodes)
 
     def tipo(self) -> Tipo:
-        """ tipo ::= INTEIRO | REAL | TEXTO | LOGICO """
         token = self.token_atual
         if token.tipo in ('INTEIRO', 'REAL', 'TEXTO', 'LOGICO'):
             self._avancar()
@@ -76,11 +66,15 @@ class Parser:
         raise SyntaxError(f"Tipo de variável inválido '{token.valor}' na linha {token.linha}")
 
     def comando(self) -> ASTNode:
-        """ Distribui o parsing para o tipo de comando correto. """
         token = self.token_atual
-
-        comandos_com_expressao = {'AVANCAR', 'RECUAR', 'GIRAR_DIREITA', 'GIRAR_ESQUERDA', 'DEFINIR_COR', 'DEFINIR_ESPESSURA', 'COR_DE_FUNDO'}
-        comandos_sem_expressao = {'LEVANTAR_CANETA', 'ABAIXAR_CANETA', 'LIMPAR_TELA'}
+        comandos_com_expressao = {
+            'AVANCAR', 'RECUAR', 'GIRAR_DIREITA', 'GIRAR_ESQUERDA',
+            'DEFINIR_COR', 'DEFINIR_ESPESSURA', 'COR_DE_FUNDO', 'CIRCULO'
+        }
+        comandos_sem_expressao = {
+            'LEVANTAR_CANETA', 'ABAIXAR_CANETA', 'LIMPAR_TELA',
+            'EMPURRAR_POSICAO', 'RESTAURAR_POSICAO'
+        }
 
         if token.tipo == 'ID': return self.atribuicao()
         if token.tipo in comandos_com_expressao:
@@ -100,7 +94,6 @@ class Parser:
         raise SyntaxError(f"Comando inesperado '{token.valor}' na linha {token.linha}")
 
     def comando_ir_para(self) -> ComandoIrPara:
-        """ comando_movimento ::= IR_PARA expressao expressao PONTO_VIRGULA """
         token = self._consumir('IR_PARA')
         expr_x = self.expressao()
         expr_y = self.expressao()
@@ -108,7 +101,6 @@ class Parser:
         return ComandoIrPara(token, expr_x, expr_y)
 
     def atribuicao(self) -> Atribuicao:
-        """ atribuicao ::= ID ATRIBUICAO expressao PONTO_VIRGULA """
         var_no = Variavel(self._consumir('ID'))
         self._consumir('ATRIBUICAO')
         expr = self.expressao()
@@ -116,7 +108,6 @@ class Parser:
         return Atribuicao(var_no, expr)
 
     def estrutura_repita(self) -> Repita:
-        """ estrutura_repita ::= REPITA expressao VEZES bloco FIM_REPITA PONTO_VIRGULA """
         self._consumir('REPITA')
         vezes_expr = self.expressao()
         self._consumir('VEZES')
@@ -126,7 +117,6 @@ class Parser:
         return Repita(vezes_expr, bloco_node)
 
     def estrutura_se(self) -> Se:
-        """ estrutura_se ::= SE expressao ENTAO bloco [ SENAO bloco ] FIM_SE PONTO_VIRGULA """
         self._consumir('SE')
         condicao = self.expressao()
         self._consumir('ENTAO')
@@ -140,7 +130,6 @@ class Parser:
         return Se(condicao, bloco_se, bloco_senao)
 
     def estrutura_enquanto(self) -> Enquanto:
-        """ estrutura_enquanto ::= ENQUANTO expressao FACA bloco FIM_ENQUANTO PONTO_VIRGULA """
         self._consumir('ENQUANTO')
         condicao = self.expressao()
         self._consumir('FACA')
@@ -150,7 +139,6 @@ class Parser:
         return Enquanto(condicao, bloco)
 
     def expressao(self) -> ASTNode:
-        """ expressao ::= termo { (OP_ARITMETICO | OP_RELACIONAL) termo } """
         node = self.termo()
         while self.token_atual and self.token_atual.tipo in ('OP_ARITMETICO', 'OP_RELACIONAL'):
             op = self.token_atual
@@ -160,7 +148,6 @@ class Parser:
         return node
 
     def termo(self) -> ASTNode:
-        """ termo ::= fator { ('*' | '/') fator } """
         node = self.fator()
         while self.token_atual and self.token_atual.valor in ('*', '/'):
             op = self.token_atual
@@ -170,7 +157,6 @@ class Parser:
         return node
 
     def fator(self) -> ASTNode:
-        """ fator ::= NUMERO_INTEIRO | NUMERO_REAL | TEXTO | ID | ( expressao ) """
         token = self.token_atual
         if token.tipo in ('NUMERO_INTEIRO', 'NUMERO_REAL', 'TEXTO', 'VERDADEIRO', 'FALSO'):
             self._avancar()
