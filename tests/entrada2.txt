@@ -1,0 +1,30 @@
+inicio
+    // 1. DECLARAÇÕES PRIMEIRO
+    var inteiro: angulo;
+
+    // 2. DEPOIS OS COMANDOS
+    cor_de_fundo "black";
+    definir_cor "magenta";
+    definir_espessura 2;
+
+    angulo = 30;
+
+    // Desenha 12 pétalas para formar uma flor
+    repita 12 vezes
+        empurrar_posicao;
+        // Salva a posição e ângulo no centro da flor
+
+        girar_direita 90;
+        circulo 100; // Desenha uma pétala (círculo)
+
+        restaurar_posicao;
+        // Volta para o centro
+
+        girar_direita angulo;
+        // Gira para a próxima pétala
+    fim_repita;
+
+    // Miolo da flor
+    definir_cor "yellow";
+    circulo 10;
+fim

@@ -1,0 +1,73 @@
+class ASTNode:
+    """ Nó base para a AST. """
+    pass
+
+class Programa(ASTNode):
+    def __init__(self, bloco):
+        self.bloco = bloco
+
+class Bloco(ASTNode):
+    def __init__(self, declaracoes, comandos):
+        self.declaracoes = declaracoes
+        self.comandos = comandos
+
+class VarDecl(ASTNode):
+    def __init__(self, tipo_no, var_nos):
+        self.tipo_no = tipo_no
+        self.var_nos = var_nos
+
+class Tipo(ASTNode):
+    def __init__(self, token):
+        self.token = token
+        self.valor = token.valor
+
+class Variavel(ASTNode):
+    def __init__(self, token):
+        self.token = token
+        self.nome = token.valor
+
+class Atribuicao(ASTNode):
+    def __init__(self, var_no, expressao):
+        self.var_no = var_no
+        self.expressao = expressao
+
+class ComandoSimples(ASTNode):
+    """ Para comandos como avancar, levantar_caneta, etc. """
+    def __init__(self, token, expressao=None):
+        self.token = token
+        self.expressao = expressao
+
+class ComandoIrPara(ASTNode):
+    def __init__(self, token, expr_x, expr_y):
+        self.token = token
+        self.expr_x = expr_x
+        self.expr_y = expr_y
+
+class Repita(ASTNode):
+    def __init__(self, vezes, bloco):
+        self.vezes = vezes
+        self.bloco = bloco
+
+class Se(ASTNode):
+    """ Representa uma estrutura 'se/senao'. """
+    def __init__(self, condicao, bloco_se, bloco_senao=None):
+        self.condicao = condicao
+        self.bloco_se = bloco_se
+        self.bloco_senao = bloco_senao
+
+class Enquanto(ASTNode):
+    """ Representa uma estrutura 'enquanto'. """
+    def __init__(self, condicao, bloco):
+        self.condicao = condicao
+        self.bloco = bloco
+
+class Literal(ASTNode):
+    def __init__(self, token):
+        self.token = token
+        self.valor = token.valor
+
+class BinOp(ASTNode):
+    def __init__(self, esq, op, dir):
+        self.esq = esq
+        self.op = op
+        self.dir = dir
