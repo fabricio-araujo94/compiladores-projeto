@@ -70,9 +70,8 @@ def tokenizar(codigo_fonte: str) -> List[Token]:
                 numero_linha += 1
             continue
         elif tipo_token == 'ERRO':
-            # Se um caractere inválido for encontrado, informa o erro
-            print(f"Erro léxico na linha {numero_linha}: caractere inesperado '{valor}'")
-            continue # Ou poderia levantar uma exceção
+            # Levanta uma exceção para parar a compilação imediatamente
+            raise SyntaxError(f"Erro Léxico na linha {numero_linha}: Caractere inválido '{valor}' não reconhecido.")
 
         tokens.append(Token(tipo_token, valor, numero_linha))
 

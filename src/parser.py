@@ -1,6 +1,5 @@
-from tokenizer import Token, tokenizar
+from tokenizer import Token
 from ast_nodes import *
-import json
 
 class Parser:
     def __init__(self, tokens: list[Token]):
@@ -44,7 +43,6 @@ class Parser:
         declaracoes = []
         comandos = []
 
-        # Tipos de token que não finalizam um bloco
         tokens_de_parada = {'FIM', 'FIM_REPITA', 'FIM_SE', 'FIM_ENQUANTO', 'SENAO', 'EOF'}
 
         while self.token_atual and self.token_atual.tipo == 'VAR':
@@ -86,14 +84,14 @@ class Parser:
 
         if token.tipo == 'ID': return self.atribuicao()
         if token.tipo in comandos_com_expressao:
-            self._avancar()
+            cmd_token = self._consumir(token.tipo)
             expr = self.expressao()
             self._consumir('PONTO_VIRGULA')
-            return ComandoSimples(token, expressao=expr)
+            return ComandoSimples(cmd_token, expressao=expr)
         if token.tipo in comandos_sem_expressao:
-            self._avancar()
+            cmd_token = self._consumir(token.tipo)
             self._consumir('PONTO_VIRGULA')
-            return ComandoSimples(token)
+            return ComandoSimples(cmd_token)
         if token.tipo == 'IR_PARA': return self.comando_ir_para()
         if token.tipo == 'REPITA': return self.estrutura_repita()
         if token.tipo == 'SE': return self.estrutura_se()
@@ -162,9 +160,7 @@ class Parser:
         return node
 
     def termo(self) -> ASTNode:
-        """ termo ::= fator { (OP_ARITMETICO_MUL) fator } """
-        # Nota: Esta implementação ainda é simplificada e não trata a precedência completa (ex: * vs +)
-        # Para isso, seria necessário um método para cada nível de precedência.
+        """ termo ::= fator { ('*' | '/') fator } """
         node = self.fator()
         while self.token_atual and self.token_atual.valor in ('*', '/'):
             op = self.token_atual
@@ -185,57 +181,10 @@ class Parser:
         elif token.tipo == 'PARENTESES' and token.valor == '(':
             self._avancar()
             node = self.expressao()
-            if self.token_atual.valor == ')':
+            if self.token_atual and self.token_atual.valor == ')':
                 self._avancar()
                 return node
             else:
-                raise SyntaxError(f"Erro de Sintaxe: Esperado ')' mas encontrou '{self.token_atual.valor}'")
+                raise SyntaxError(f"Erro de Sintaxe: Esperado ')' mas encontrou '{self.token_atual.valor if self.token_atual else 'EOF'}'")
         else:
             raise SyntaxError(f"Fator inesperado na expressão: '{token.valor}' na linha {token.linha}")
-
-
-# --- Função auxiliar para imprimir a AST de forma legível ---
-def ast_para_dict(node):
-    if not isinstance(node, ASTNode):
-        return node
-    result = {'node_type': node.__class__.__name__}
-    for key, value in node.__dict__.items():
-        if isinstance(value, list):
-            result[key] = [ast_para_dict(v) for v in value]
-        elif key == 'token':
-             result[key] = {'tipo': value.tipo, 'valor': value.valor, 'linha': value.linha}
-        else:
-            result[key] = ast_para_dict(value)
-    return result
-
-# --- Exemplo de uso ---
-if __name__ == '__main__':
-    # Testando com o Exemplo 3 do PDF, que é mais completo
-    codigo_exemplo_3 = """
-inicio
-    var inteiro: lado;
-    var texto: cor;
-
-    lado = 5;
-    cor_de_fundo "black";
-    definir_espessura 2;
-
-    repita 50 vezes
-        definir_cor "cyan";
-        avancar lado;
-        girar_direita 90;
-        lado = lado + 5;
-    fim_repita;
-fim
-"""
-    try:
-        tokens = tokenizar(codigo_exemplo_3)
-        parser = Parser(tokens)
-        arvore_sintatica = parser.parse()
-        print("Análise Sintática concluída com sucesso!")
-
-        # Imprimir a AST em formato JSON para visualização
-        print(json.dumps(ast_para_dict(arvore_sintatica), indent=2))
-
-    except SyntaxError as e:
-        print(e)
