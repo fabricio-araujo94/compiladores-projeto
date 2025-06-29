@@ -139,8 +139,17 @@ class Parser:
         return Enquanto(condicao, bloco)
 
     def expressao(self) -> ASTNode:
+        node = self.expressao_soma()
+        if self.token_atual and self.token_atual.tipo == 'OP_RELACIONAL':
+            op = self.token_atual
+            self._avancar()
+            dir = self.expressao_soma()
+            node = BinOp(esq=node, op=op, dir=dir)
+        return node
+
+    def expressao_soma(self) -> ASTNode:
         node = self.termo()
-        while self.token_atual and self.token_atual.tipo in ('OP_ARITMETICO', 'OP_RELACIONAL'):
+        while self.token_atual and self.token_atual.tipo == 'OP_ARITMETICO':
             op = self.token_atual
             self._avancar()
             dir = self.termo()
