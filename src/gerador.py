@@ -1,4 +1,4 @@
-import ast_nodes as ast
+import src.ast_nodes as ast
 
 class Visitor:
     def visit(self, node):
