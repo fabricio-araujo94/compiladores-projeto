@@ -1,5 +1,5 @@
-from tokenizer import Token
-from ast_nodes import *
+from src.tokenizer import Token
+from src.ast_nodes import *
 
 class Parser:
     def __init__(self, tokens: list[Token]):
@@ -39,24 +39,46 @@ class Parser:
         comandos = []
         tokens_de_parada = {'FIM', 'FIM_REPITA', 'FIM_SE', 'FIM_ENQUANTO', 'SENAO', 'EOF'}
 
-        while self.token_atual and self.token_atual.tipo == 'VAR':
-            declaracoes.append(self.declaracao_variaveis())
-
         while self.token_atual and self.token_atual.tipo not in tokens_de_parada:
-            comandos.append(self.comando())
+            if self.token_atual.tipo == 'VAR':
+                nodes_gerados = self.declaracao_variaveis()
+                for node in nodes_gerados:
+                    if isinstance(node, VarDecl):
+                        declaracoes.append(node)
+                    else: 
+                        comandos.append(node)
+            else:
+                comandos.append(self.comando())
 
         return Bloco(declaracoes, comandos)
 
-    def declaracao_variaveis(self) -> VarDecl:
+    def declaracao_variaveis(self) -> list[ASTNode]:
+        nodes_gerados = []
         self._consumir('VAR')
         tipo_node = self.tipo()
         self._consumir('DOIS_PONTOS')
-        var_nodes = [Variavel(self._consumir('ID'))]
-        while self.token_atual.tipo == 'VIRGULA':
+        
+        variaveis_declaradas = []
+        
+        while True:
+            var_token = self._consumir('ID')
+            variaveis_declaradas.append(Variavel(var_token))
+            
+            if self.token_atual and self.token_atual.tipo == 'ATRIBUICAO':
+                self._consumir('ATRIBUICAO')
+                expressao_node = self.expressao()
+                atribuicao_node = Atribuicao(var_no=Variavel(var_token), expressao=expressao_node)
+                nodes_gerados.append(atribuicao_node)
+            
+            if self.token_atual.tipo != 'VIRGULA':
+                break
             self._consumir('VIRGULA')
-            var_nodes.append(Variavel(self._consumir('ID')))
         self._consumir('PONTO_VIRGULA')
-        return VarDecl(tipo_node, var_nodes)
+
+        declaracao_node = VarDecl(tipo_node, variaveis_declaradas)
+        nodes_gerados.insert(0, declaracao_node)
+
+        return nodes_gerados
 
     def tipo(self) -> Tipo:
         token = self.token_atual
