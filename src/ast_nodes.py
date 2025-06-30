@@ -1,6 +1,13 @@
 class ASTNode:
     """ Nó base para a AST. """
-    pass
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return self.__dict__ == other.__dict__
+
+    def __repr__(self):
+        attrs = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items())
+        return f"{self.__class__.__name__}({attrs})"
 
 class Programa(ASTNode):
     def __init__(self, bloco):
