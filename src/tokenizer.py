@@ -28,9 +28,9 @@ def tokenizar(codigo_fonte: str) -> List[Token]:
         ('NUMERO_INTEIRO',  r'\d+'),                   # Números inteiros, ex: 100 [cite: 16, 30]
         ('TEXTO',           r'"[^"]*"'),               # Strings de texto, ex: "blue" [cite: 18, 31]
         ('ID',              r'[a-zA-Z_]\w*'),           # Identificadores (variáveis e palavras-chave)
-        ('ATRIBUICAO',      r'='),                     # Operador de atribuição
         ('OP_ARITMETICO',   r'[+\-*/%]'),              # Operadores aritméticos
         ('OP_RELACIONAL',   r'==|!=|<|>|<=|>='),       # Operadores relacionais
+        ('ATRIBUICAO',      r'='),                     # Operador de atribuição
         ('PONTO_VIRGULA',   r';'),                     # Delimitador de comando [cite: 14]
         ('DOIS_PONTOS',     r':'),                     # Usado em declarações 'var tipo: id;'
         ('VIRGULA',         r','),                     # Separador de variáveis em declarações
