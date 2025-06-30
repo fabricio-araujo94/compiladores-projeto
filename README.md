@@ -6,26 +6,26 @@ O compilador será responsável por realizar as análises léxica, sintática e 
 
 ## To-Do
 ### Analisador Léxico (tokenizer.py):
-- [ ] Implementar o tokenizador manual para reconhecer todos os elementos da linguagem TurtleScript.
+- [x] Implementar o tokenizador manual para reconhecer todos os elementos da linguagem TurtleScript.
 
 ### Analisador Sintático (parser.py): 
-- [ ] Verificar se a gramática da linguagem é LL(1) e fazer as modificações necessárias.
-- [ ] Implementar o parser recursivo descendente LL(1). 
-- [ ] Construir a Árvore Sintática Abstrata (AST) durante a análise. 
+- [x] Verificar se a gramática da linguagem é LL(1) e fazer as modificações necessárias.
+- [x] Implementar o parser recursivo descendente LL(1). 
+- [x] Construir a Árvore Sintática Abstrata (AST) durante a análise. 
 
 ### Analisador Semântico (semantico.py): 
-- [ ] Implementar a Tabela de Símbolos para armazenar variáveis e seus tipos.
-- [ ] Implementar a verificação de declaração de variáveis (evitar uso antes da declaração e redeclarações).
-- [ ] Implementar a verificação de tipos estática para atribuições e argumentos de comandos.
+- [x] Implementar a Tabela de Símbolos para armazenar variáveis e seus tipos.
+- [x] Implementar a verificação de declaração de variáveis (evitar uso antes da declaração e redeclarações).
+- [x] Implementar a verificação de tipos estática para atribuições e argumentos de comandos.
 
 ### Gerador de Código (gerador.py): 
-- [ ] Implementar o percurso na AST para gerar código Python.
-- [ ] Garantir que o código gerado utilize a biblioteca Turtle Graphics corretamente.
-- [ ] Salvar o código gerado em arquivos .py executáveis.
+- [x] Implementar o percurso na AST para gerar código Python.
+- [x] Garantir que o código gerado utilize a biblioteca Turtle Graphics corretamente.
+- [x] Salvar o código gerado em arquivos .py executáveis.
 
 ### Funcionalidades Adicionais:
-- [ ] Criar e implementar pelo menos dois novos comandos para a linguagem.
-- [ ] Informar erros léxicos, sintáticos ou semânticos de forma clara.
+- [x] Criar e implementar pelo menos dois novos comandos para a linguagem.
+- [x] Informar erros léxicos, sintáticos ou semânticos de forma clara.
 
 ### Testes e Automação: 
 - [ ] Criar no mínimo 3 arquivos de teste.
