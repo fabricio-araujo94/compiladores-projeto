@@ -39,7 +39,6 @@ class Atribuicao(ASTNode):
         self.expressao = expressao
 
 class ComandoSimples(ASTNode):
-    """ Para comandos como avancar, levantar_caneta, etc. """
     def __init__(self, token, expressao=None):
         self.token = token
         self.expressao = expressao
@@ -56,14 +55,12 @@ class Repita(ASTNode):
         self.bloco = bloco
 
 class Se(ASTNode):
-    """ Representa uma estrutura 'se/senao'. """
     def __init__(self, condicao, bloco_se, bloco_senao=None):
         self.condicao = condicao
         self.bloco_se = bloco_se
         self.bloco_senao = bloco_senao
 
 class Enquanto(ASTNode):
-    """ Representa uma estrutura 'enquanto'. """
     def __init__(self, condicao, bloco):
         self.condicao = condicao
         self.bloco = bloco
@@ -72,6 +69,12 @@ class Literal(ASTNode):
     def __init__(self, token):
         self.token = token
         self.valor = token.valor
+
+class UnaryOp(ASTNode):
+    def __init__(self, op, expr):
+        self.op = op
+        self.token = op
+        self.expr = expr
 
 class BinOp(ASTNode):
     def __init__(self, esq, op, dir):

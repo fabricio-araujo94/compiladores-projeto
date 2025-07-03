@@ -1,4 +1,4 @@
-import src.ast_nodes as ast
+from src.ast_nodes import *
 
 class TabelaSimbolos:
     """ Armazena informações sobre as variáveis (símbolos), como seu tipo. """
@@ -40,22 +40,22 @@ class AnalisadorSemantico(Visitor):
             'CIRCULO': ['inteiro', 'real'] # Adicionado
         }
 
-    def visit_Programa(self, node: ast.Programa):
+    def visit_Programa(self, node: Programa):
         self.visit(node.bloco)
 
-    def visit_Bloco(self, node: ast.Bloco):
+    def visit_Bloco(self, node: Bloco):
         for declaracao in node.declaracoes:
             self.visit(declaracao)
         for comando in node.comandos:
             self.visit(comando)
 
-    def visit_VarDecl(self, node: ast.VarDecl):
+    def visit_VarDecl(self, node: VarDecl):
         tipo_var = node.tipo_no.valor
         for var_node in node.var_nos:
             nome_var = var_node.nome
             self.tabela_simbolos.declarar(nome_var, tipo_var, var_node.token.linha)
 
-    def visit_Atribuicao(self, node: ast.Atribuicao):
+    def visit_Atribuicao(self, node: Atribuicao):
         nome_var = node.var_no.nome
         linha = node.var_no.token.linha
         tipo_declarado = self.tabela_simbolos.buscar(nome_var, linha)
@@ -66,22 +66,31 @@ class AnalisadorSemantico(Visitor):
             pass # Isso é permitido (promoção de tipo)
         elif tipo_declarado != tipo_expressao:
             raise TypeError(
-                f"Erro Semântico na linha {linha}: Tipos incompatíveis. Não é possível atribuir '{tipo_expressao}' a uma variável do tipo '{tipo_declarado}' ('{nome_var}')."
+                f"Erro Semântico na linha {linha}: Tipos incompatíveis. Não é possível atribuir \
+                '{tipo_expressao}' a uma variável do tipo '{tipo_declarado}' ('{nome_var}')."
             )
 
-    def visit_Variavel(self, node: ast.Variavel):
+    def visit_Variavel(self, node: Variavel):
         nome_var = node.nome
         linha = node.token.linha
         return self.tabela_simbolos.buscar(nome_var, linha)
 
-    def visit_Literal(self, node: ast.Literal):
+    def visit_Literal(self, node: Literal):
         if node.token.tipo == 'NUMERO_INTEIRO': return 'inteiro'
         if node.token.tipo == 'NUMERO_REAL': return 'real'
         if node.token.tipo == 'TEXTO': return 'texto'
         if node.token.tipo in ('VERDADEIRO', 'FALSO'): return 'logico'
         return 'desconhecido'
 
-    def visit_BinOp(self, node: ast.BinOp):
+    def visit_UnaryOp(self, node: UnaryOp):
+        linha = node.op.linha
+        tipo_expr = self.visit(node.expr)
+        if tipo_expr not in ('inteiro', 'real'):
+            raise TypeError(f"Erro Semântico na linha {linha}: O operador unário '{node.op.valor} só pode \
+                            ser aplicado a tipos numéricos (inteiro/real), mas foi aplicado a '{tipo_expr}'.")
+        return tipo_expr
+
+    def visit_BinOp(self, node: BinOp):
         linha = node.op.linha
         tipo_esq = self.visit(node.esq)
         tipo_dir = self.visit(node.dir)
@@ -89,23 +98,26 @@ class AnalisadorSemantico(Visitor):
         op_logicos = ['==', '!=', '<', '>', '<=', '>=']
         if node.op.valor in op_logicos:
             if tipo_esq != tipo_dir:
-                 raise TypeError(f"Erro Semântico na linha {linha}: Comparação entre tipos incompatíveis ('{tipo_esq}' e '{tipo_dir}').")
+                 raise TypeError(f"Erro Semântico na linha {linha}: Comparação entre tipos incompatíveis \
+                                  ('{tipo_esq}' e '{tipo_dir}').")
             return 'logico'
 
         if tipo_esq != tipo_dir:
             # Permitir operações entre inteiro e real, resultando em real
             if {tipo_esq, tipo_dir} == {'inteiro', 'real'}:
                 return 'real'
-            raise TypeError(f"Erro Semântico na linha {linha}: Operação com tipos incompatíveis ('{tipo_esq}' e '{tipo_dir}').")
+            raise TypeError(f"Erro Semântico na linha {linha}: Operação com tipos incompatíveis ('{tipo_esq}' \
+                             e '{tipo_dir}').")
         return tipo_esq
 
-    def visit_Repita(self, node: ast.Repita):
+    def visit_Repita(self, node: Repita):
         linha = node.vezes.token.linha if hasattr(node.vezes, 'token') else 'desconhecida'
-        if not isinstance(node.vezes, ast.Literal) or node.vezes.token.tipo != 'NUMERO_INTEIRO':
-            raise TypeError(f"Erro Semântico na linha {linha}: O comando 'repita' espera um número inteiro literal como argumento.")
+        if not isinstance(node.vezes, Literal) or node.vezes.token.tipo != 'NUMERO_INTEIRO':
+            raise TypeError(f"Erro Semântico na linha {linha}: O comando 'repita' espera um número inteiro \
+                            literal como argumento.")
         self.visit(node.bloco)
 
-    def visit_ComandoSimples(self, node: ast.ComandoSimples):
+    def visit_ComandoSimples(self, node: ComandoSimples):
         linha = node.token.linha
         comando = node.token.tipo
 
@@ -118,26 +130,30 @@ class AnalisadorSemantico(Visitor):
         tipos_esperados = self.regras_comandos.get(comando)
 
         if tipos_esperados and tipo_argumento not in tipos_esperados:
-            raise TypeError(f"Erro Semântico na linha {linha}: O comando '{node.token.valor}' esperava um argumento do tipo '{' ou '.join(tipos_esperados)}', mas recebeu '{tipo_argumento}'.")
+            raise TypeError(f"Erro Semântico na linha {linha}: O comando '{node.token.valor}' esperava \
+                            um argumento do tipo '{' ou '.join(tipos_esperados)}', mas recebeu '{tipo_argumento}'.")
 
-    def visit_ComandoIrPara(self, node: ast.ComandoIrPara):
+    def visit_ComandoIrPara(self, node: ComandoIrPara):
         linha = node.token.linha
         tipo_x = self.visit(node.expr_x)
         tipo_y = self.visit(node.expr_y)
         tipos_validos = ['inteiro', 'real']
         if tipo_x not in tipos_validos or tipo_y not in tipos_validos:
-            raise TypeError(f"Erro Semântico na linha {linha}: O comando 'ir_para' espera dois argumentos numéricos (inteiro/real).")
+            raise TypeError(f"Erro Semântico na linha {linha}: O comando 'ir_para' espera dois \
+                            argumentos numéricos (inteiro/real).")
 
-    def visit_Se(self, node: ast.Se):
+    def visit_Se(self, node: Se):
         tipo_condicao = self.visit(node.condicao)
         if tipo_condicao != 'logico':
-            raise TypeError(f"Erro Semântico: A condição da estrutura 'se' deve ser do tipo 'logico', mas é '{tipo_condicao}'.")
+            raise TypeError(f"Erro Semântico: A condição da estrutura 'se' deve ser do tipo 'logico', \
+                            mas é '{tipo_condicao}'.")
         self.visit(node.bloco_se)
         if node.bloco_senao:
             self.visit(node.bloco_senao)
 
-    def visit_Enquanto(self, node: ast.Enquanto):
+    def visit_Enquanto(self, node: Enquanto):
         tipo_condicao = self.visit(node.condicao)
         if tipo_condicao != 'logico':
-            raise TypeError(f"Erro Semântico: A condição da estrutura 'enquanto' deve ser do tipo 'logico', mas é '{tipo_condicao}'.")
+            raise TypeError(f"Erro Semântico: A condição da estrutura 'enquanto' deve ser do tipo 'logico', \
+                            mas é '{tipo_condicao}'.")
         self.visit(node.bloco)

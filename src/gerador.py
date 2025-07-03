@@ -101,6 +101,12 @@ class GeradorDeCodigo(Visitor):
         expressao = self.visit(node.expressao)
         return f"{var_nome} = {expressao}"
 
+    def visit_UnaryOp(self, node: ast.UnaryOp):
+        op = node.op.valor
+        expr = self.visit(node.expr)
+        # Usa parênteses para garantir a precedência correta no código Python
+        return f"({op}{expr})"
+
     def visit_BinOp(self, node: ast.BinOp):
         esq = self.visit(node.esq)
         op = node.op.valor

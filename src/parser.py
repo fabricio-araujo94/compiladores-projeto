@@ -189,6 +189,12 @@ class Parser:
 
     def fator(self) -> ASTNode:
         token = self.token_atual
+        if token.tipo == 'OP_ARITMETICO' and token.valor in ('+', '-'):
+            op_token = self.token_atual
+            self._avancar()
+            node = self.fator()
+            return UnaryOp(op=op_token, expr=node)
+
         if token.tipo in ('NUMERO_INTEIRO', 'NUMERO_REAL', 'TEXTO', 'VERDADEIRO', 'FALSO'):
             self._avancar()
             return Literal(token)
@@ -198,10 +204,11 @@ class Parser:
         elif token.tipo == 'PARENTESES' and token.valor == '(':
             self._avancar()
             node = self.expressao()
-            if self.token_atual and self.token_atual.valor == ')':
-                self._avancar()
-                return node
+            if self.token_atual and self.token_atual.tipo == 'PARENTESES' and self.token_atual.valor == ')':
+                self._avancar() 
             else:
-                raise SyntaxError(f"Erro de Sintaxe: Esperado ')' mas encontrou '{self.token_atual.valor if self.token_atual else 'EOF'}'")
+                valor_encontrado = self.token_atual.valor if self.token_atual else 'EOF'
+                raise SyntaxError(f"Erro de Sintaxe na linha {self.token_atual.linha}: Esperado ')' mas encontrou '{valor_encontrado}'")
+            return node
         else:
             raise SyntaxError(f"Fator inesperado na expressão: '{token.valor}' na linha {token.linha}")
