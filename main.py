@@ -17,7 +17,7 @@ def main():
     caminho_arquivo_entrada = sys.argv[1]
 
     nome_base = os.path.splitext(os.path.basename(caminho_arquivo_entrada))[0]
-    caminho_arquivo_saida = os.path.join('examples', 'output', f'{nome_base}.py')
+    caminho_arquivo_saida = os.path.join('examples', 'output', f'saida_{nome_base}.py')
 
     try:
         with open(caminho_arquivo_entrada, 'r', encoding='utf-8') as arquivo:
