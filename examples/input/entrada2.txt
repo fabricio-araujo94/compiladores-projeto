@@ -1,0 +1,24 @@
+inicio
+    var inteiro: angulo;
+
+    cor_de_fundo "black";
+    definir_cor "magenta";
+    definir_espessura 2;
+
+    angulo = 30;
+
+    // Desenha 12 pétalas para formar uma flor
+    repita 12 vezes
+        empurrar_posicao;
+
+        girar_direita 90;
+        circulo 100; 
+
+        restaurar_posicao;
+
+        girar_direita angulo;
+    fim_repita;
+
+    definir_cor "yellow";
+    circulo 10;
+fim

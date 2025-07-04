@@ -1,0 +1,22 @@
+inicio
+    var inteiro: lado = 100;
+    var inteiro: angulo_ponta = 144;
+    var inteiro: angulo_interno = 72;
+    var texto: cor = "blue";
+
+    definir_cor(cor);
+    definir_espessura 3;
+
+    var inteiro: i = 0;
+
+    enquanto i < 5 faca
+        avancar lado;
+        girar_direita angulo_ponta;
+
+        avancar lado;
+        girar_esquerda angulo_interno;
+
+        i = i + 1;
+    fim_enquanto;
+
+fim

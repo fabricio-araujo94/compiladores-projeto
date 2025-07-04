@@ -1,7 +1,6 @@
 import sys
 import os
 
-# Adiciona o diretório 'src' ao caminho de busca de módulos do Python
 diretorio_src = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.append(diretorio_src)
 
@@ -17,9 +16,8 @@ def main():
 
     caminho_arquivo_entrada = sys.argv[1]
 
-    # Define o nome do arquivo de saída
     nome_base = os.path.splitext(os.path.basename(caminho_arquivo_entrada))[0]
-    caminho_arquivo_saida = f"saida_{nome_base}.py"
+    caminho_arquivo_saida = os.path.join('examples', 'output', f'{nome_base}.py')
 
     try:
         with open(caminho_arquivo_entrada, 'r', encoding='utf-8') as arquivo:
@@ -34,14 +32,13 @@ def main():
         analisador_semantico.visit(arvore_sintatica)
         print("Análise Léxica, Sintática e Semântica concluídas com sucesso!")
 
-        # --- FASE 4: Geração de Código ---
-        print("\n4. Geração de Código...")
+        # Geração do Código
         gerador = GeradorDeCodigo()
         codigo_python = gerador.gerar(arvore_sintatica, nome_base)
 
+        os.makedirs(os.path.dirname(caminho_arquivo_saida), exist_ok=True)
         with open(caminho_arquivo_saida, 'w', encoding='utf-8') as arquivo_saida:
             arquivo_saida.write(codigo_python)
-        print(f"   Código Python gerado com sucesso no arquivo: {caminho_arquivo_saida}")
 
         print("\n--- Compilação finalizada com sucesso! ---")
 

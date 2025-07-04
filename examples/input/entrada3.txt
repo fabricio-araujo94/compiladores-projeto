@@ -1,0 +1,32 @@
+inicio
+    var inteiro: lado = 80;
+
+    se 50 > 30 entao
+        definir_cor("blue");
+    senao
+        definir_cor("green");
+    fim_se;
+
+    repita 4 vezes
+        recuar lado;
+        girar_esquerda 90;
+    fim_repita;
+
+    levantar_caneta;
+
+    ir_para 120 -50;
+
+    abaixar_caneta;
+
+    se 50 < 30 entao
+        definir_cor("blue");
+    senao
+        definir_cor("green");
+    fim_se;
+
+    repita 4 vezes
+        avancar lado;
+        girar_direita 90;
+    fim_repita;
+
+fim
