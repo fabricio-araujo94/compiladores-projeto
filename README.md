@@ -4,6 +4,11 @@ Este é o repositório para o projeto final da disciplina de Compiladores (2025.
 
 O compilador será responsável por realizar as análises léxica, sintática e semântica de um código-fonte em TurtleScript e traduzi-lo para um código Python funcional que utiliza a biblioteca Turtle Graphics para gerar desenhos vetoriais. 
 
+##  Equipe
+  * Felipe Amorim Barbosa
+  * Renan Carneiro Batista
+  * Fabricio Araújo Dias
+
 ## To-Do
 ### Analisador Léxico (tokenizer.py):
 - [x] Implementar o tokenizador manual para reconhecer todos os elementos da linguagem TurtleScript.
@@ -28,10 +33,5 @@ O compilador será responsável por realizar as análises léxica, sintática e 
 - [x] Informar erros léxicos, sintáticos ou semânticos de forma clara.
 
 ### Testes e Automação: 
-- [ ] Criar no mínimo 3 arquivos de teste.
-- [ ] Criar um script de automação para compilar os arquivos de teste.
-
-##  Equipe
-  * Felipe Amorim Barbosa
-  * Renan Carneiro Batista
-  * Fabricio Araújo Dias
+- [x] Criar no mínimo 3 arquivos de teste.
+- [x] Criar um script de automação para compilar os arquivos de teste.

@@ -1,4 +1,4 @@
-import src.ast_nodes as ast
+from src.ast_nodes import *
 
 class Visitor:
     def visit(self, node):
@@ -36,10 +36,10 @@ class GeradorDeCodigo(Visitor):
         self.codigo_python.append("turtle.done()")
         return "\n".join(self.codigo_python)
 
-    def visit_Programa(self, node: ast.Programa):
+    def visit_Programa(self, node: Programa):
         self.visit(node.bloco)
 
-    def visit_Bloco(self, node: ast.Bloco):
+    def visit_Bloco(self, node: Bloco):
         if self.nivel_indentacao == 0:
             self.codigo_python.append("# Inicialização de variáveis")
             for declaracao in node.declaracoes:
@@ -50,7 +50,7 @@ class GeradorDeCodigo(Visitor):
             if linha_codigo is not None:
                 self.codigo_python.append(self._indentar(linha_codigo))
 
-    def visit_ComandoSimples(self, node: ast.ComandoSimples):
+    def visit_ComandoSimples(self, node: ComandoSimples):
         comando = node.token.tipo
         if comando == 'EMPURRAR_POSICAO':
             return "pilha_posicao.append({'pos': t.pos(), 'heading': t.heading()})"
@@ -77,43 +77,43 @@ class GeradorDeCodigo(Visitor):
         else:
             return f"t.{comando_python}()"
 
-    def visit_ComandoIrPara(self, node: ast.ComandoIrPara):
+    def visit_ComandoIrPara(self, node: ComandoIrPara):
         x = self.visit(node.expr_x)
         y = self.visit(node.expr_y)
         return f"t.goto({x}, {y})"
 
-    def visit_Literal(self, node: ast.Literal):
+    def visit_Literal(self, node: Literal):
         valor = node.valor
         if node.token.tipo == 'TEXTO':
             return f'{valor}'
         return valor
 
-    def visit_Variavel(self, node: ast.Variavel):
+    def visit_Variavel(self, node: Variavel):
         return node.nome
 
-    def visit_VarDecl(self, node: ast.VarDecl):
+    def visit_VarDecl(self, node: VarDecl):
         valor_padrao = {'inteiro': 0, 'real': 0.0, 'texto': '""', 'logico': 'False'}.get(node.tipo_no.valor)
         for var in node.var_nos:
             self.codigo_python.append(f"{var.nome} = {valor_padrao}")
 
-    def visit_Atribuicao(self, node: ast.Atribuicao):
+    def visit_Atribuicao(self, node: Atribuicao):
         var_nome = self.visit(node.var_no)
         expressao = self.visit(node.expressao)
         return f"{var_nome} = {expressao}"
 
-    def visit_UnaryOp(self, node: ast.UnaryOp):
+    def visit_UnaryOp(self, node: UnaryOp):
         op = node.op.valor
         expr = self.visit(node.expr)
         # Usa parênteses para garantir a precedência correta no código Python
         return f"({op}{expr})"
 
-    def visit_BinOp(self, node: ast.BinOp):
+    def visit_BinOp(self, node: BinOp):
         esq = self.visit(node.esq)
         op = node.op.valor
         dir = self.visit(node.dir)
         return f"({esq} {op} {dir})"
 
-    def visit_Repita(self, node: ast.Repita):
+    def visit_Repita(self, node: Repita):
         vezes = self.visit(node.vezes)
         self.codigo_python.append(self._indentar(f"for _ in range({vezes}):"))
         self.nivel_indentacao += 1
@@ -121,7 +121,7 @@ class GeradorDeCodigo(Visitor):
         self.nivel_indentacao -= 1
         return None
 
-    def visit_Se(self, node: ast.Se):
+    def visit_Se(self, node: Se):
         condicao = self.visit(node.condicao)
         self.codigo_python.append(self._indentar(f"if {condicao}:"))
         self.nivel_indentacao += 1
@@ -134,7 +134,7 @@ class GeradorDeCodigo(Visitor):
             self.nivel_indentacao -= 1
         return None
 
-    def visit_Enquanto(self, node: ast.Enquanto):
+    def visit_Enquanto(self, node: Enquanto):
         condicao = self.visit(node.condicao)
         self.codigo_python.append(self._indentar(f"while {condicao}:"))
         self.nivel_indentacao += 1

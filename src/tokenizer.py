@@ -2,23 +2,11 @@ import re
 from typing import List, NamedTuple, Pattern
 
 class Token(NamedTuple):
-    """
-    Representa um token, com um tipo, um valor (lexema) e a linha onde foi encontrado.
-    """
     tipo: str
     valor: str
     linha: int
 
 def tokenizar(codigo_fonte: str) -> List[Token]:
-    """
-    Função principal que transforma o código-fonte em uma lista de tokens.
-
-    Args:
-        codigo_fonte: O código em TurtleScript como uma string.
-
-    Returns:
-        Uma lista de Tokens.
-    """
 
     # A ordem é importante, pois algumas regras podem ter prefixos em comum.
     especificacao_tokens = [

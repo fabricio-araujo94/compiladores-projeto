@@ -28,7 +28,7 @@ class Visitor:
 class AnalisadorSemantico(Visitor):
     def __init__(self):
         self.tabela_simbolos = TabelaSimbolos()
-        # --- ATUALIZE ESTE DICIONÁRIO ---
+        
         self.regras_comandos = {
             'AVANCAR': ['inteiro', 'real'],
             'RECUAR': ['inteiro', 'real'],
@@ -37,7 +37,7 @@ class AnalisadorSemantico(Visitor):
             'DEFINIR_ESPESSURA': ['inteiro', 'real'],
             'DEFINIR_COR': ['texto'],
             'COR_DE_FUNDO': ['texto'],
-            'CIRCULO': ['inteiro', 'real'] # Adicionado
+            'CIRCULO': ['inteiro', 'real']
         }
 
     def visit_Programa(self, node: Programa):
@@ -61,7 +61,6 @@ class AnalisadorSemantico(Visitor):
         tipo_declarado = self.tabela_simbolos.buscar(nome_var, linha)
         tipo_expressao = self.visit(node.expressao)
 
-        # Regra especial: permite atribuir inteiro a real, mas não o contrário
         if tipo_declarado == 'real' and tipo_expressao == 'inteiro':
             pass # Isso é permitido (promoção de tipo)
         elif tipo_declarado != tipo_expressao:
